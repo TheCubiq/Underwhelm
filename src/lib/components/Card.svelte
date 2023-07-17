@@ -1,12 +1,18 @@
 <script>
   import { spring } from "svelte/motion";
+  import { fade } from "svelte/transition";
 
   export let cardData;
+  export let totalCardCount = 0;
+
   let isDragging = false;
   let moveStartPos = { x: 0, y: 0 };
 
   // https://svelte.dev/tutorial/spring
-  let cardPosition = spring({ x: 0, y: 0 }, { stiffness: 0.1, damping: 0.25 });
+  let cardPosition = spring(
+    { x: 0, y: 0, rot: 360 },
+    { stiffness: 0.1, damping: 0.25 }
+  );
 
   const getTouchingPos = (e) => {
     e = e.clientX ? e : e.touches[0];
@@ -39,24 +45,39 @@
     moveCard(deltaX, deltaY);
   };
 
-  const moveCard = (x, y, speed = 0) => {
-    cardPosition.set({ x: x, y: y }, { soft: speed });
+  const moveCard = (x, y, rot = 0, speed = 0) => {
+    cardPosition.set({ x, y, rot }, { soft: speed });
+  };
+
+  const cardBackToDeck = () => {
+    const rot = ((cardData.id / totalCardCount) - 0.5) * 2;
+    moveCard(
+      Math.sin(rot) * 300 * 1,
+      Math.cos(rot) * 300 * -1,
+      (rot) * 32.5,
+      3
+    );
   };
 
   const handleMouseUp = (e) => {
     if (!isDragging) return;
     isDragging = false;
-    moveCard(0, 0, 3);
+    // update
+    cardData.id = cardData.id;
   };
+
+  $: cardBackToDeck(cardData.id);
 </script>
 
 <div
+  transition:fade
   class="card"
   on:mousedown={handleCardTouch}
   on:touchstart={handleCardTouch}
   style:--bgColor={`hsl(${$cardPosition.x / 10 + cardData.id * 5}, 50%, 50%)`}
   style:--posX={`${$cardPosition.x}px`}
   style:--posY={`${$cardPosition.y}px`}
+  style:--rot={`${$cardPosition.rot}deg`}
   class:dragging={isDragging}
 >
   <p>
@@ -73,6 +94,7 @@
 
 <style>
   .card {
+    position: absolute;
     user-select: none;
     margin-inline: -1em;
     aspect-ratio: 5/8;
@@ -84,8 +106,8 @@
     transition: box-shadow 0.2s ease-in-out;
 
     /* transition: transform 1s ease-in-out; */
-    transform-origin: bottom center;
-    transform: translate3d(var(--posX), var(--posY), 0);
+    /* transform-origin: bottom center; */
+    transform: translate3d(var(--posX), var(--posY), 0) rotate(var(--rot));
   }
 
   .card p {

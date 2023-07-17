@@ -18,31 +18,26 @@
       id: 4,
       title: "Card 4",
     },
-    {
-      id: 5,
-      title: "Card 4",
-    },
-    {
-      id: 6,
-      title: "Card 4",
-    },
-  ]  
-
+  ];
 </script>
+
+<button
+  on:click={() =>
+    (cardsData = [
+      ...cardsData,
+      { id: cardsData.length + 1, title: `Card ${cardsData.length + 1}` },
+    ])}>Add Card</button
+>
+
 
 <div class="wrapper">
   {#each cardsData as cardData (cardData.id)}
-    <Card {cardData} />     
+    <Card {cardData} totalCardCount={cardsData.length}  />
   {/each}
-  
 </div>
 
 <style>
-.wrapper {
-  /*   overflow: hidden; */
-  display: flex;
-}
-
-
-
+  .wrapper {
+    display: flex;
+  }
 </style>
