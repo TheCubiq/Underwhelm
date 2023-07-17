@@ -1,15 +1,19 @@
 <script>
+  import { spring } from "svelte/motion";
+
   export let cardData;
   let isDragging = false;
   let mouseStart = { x: 0, y: 0 };
-  let cardPosition = { x: 0, y: 0 };
+    
+  // https://svelte.dev/tutorial/spring
+  let cardPosition = spring({ x: 0, y: 0 }, { stiffness: 0.1, damping: 0.25 });
 
   const handleMouseDown = (e) => {
     e.preventDefault();
     isDragging = true;
     mouseStart = {
-      x: e.clientX - cardPosition.x,
-      y: e.clientY - cardPosition.y,
+      x: e.clientX - $cardPosition.x,
+      y: e.clientY - $cardPosition.y,
     };
     console.log(e, mouseStart);
   };
@@ -24,10 +28,7 @@
   };
 
   const moveCard = (x, y) => {
-    cardPosition = {
-      x: x,
-      y: y,
-    };
+    cardPosition.set({ x: x, y: y });
   };
 
   const handleMouseUp = (e) => {
@@ -40,10 +41,9 @@
 <div
   class="card"
   on:mousedown={handleMouseDown}
-  style:--posX={`${cardPosition.x}px`}
-  style:--posY={`${cardPosition.y}px`}
-  style:--cardTilt={`${cardPosition.x / 10}deg`}
-  style:--bgColor={`hsl(${(cardPosition.x / 10) + (cardData.id * 5)}, 50%, 50%)`}
+  style:--bgColor={`hsl(${$cardPosition.x / 10 + cardData.id * 5}, 50%, 50%)`}
+  style:--posX={`${$cardPosition.x}px`}
+  style:--posY={`${$cardPosition.y}px`}
   class:dragging={isDragging}
 >
   {cardData.id}
@@ -63,7 +63,7 @@
 
     /* transition: transform 1s ease-in-out; */
     transform-origin: bottom center;
-    transform: translate3d(var(--posX), var(--posY), 0) rotate(var(--cardTilt));
+    transform: translate3d(var(--posX), var(--posY), 0);
   }
 
   .card.dragging {
