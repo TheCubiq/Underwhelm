@@ -6,9 +6,11 @@
   export let totalCardCount = 0;
 
   let isDragging = false;
+  let cardSavedPos = { x: 0, y: 0 };
   let moveStartPos = { x: 0, y: 0 };
 
-  let tiltAngle = 40;
+  const tiltAngle = 40;
+  const deadZoneRange = 150;
 
   // https://svelte.dev/tutorial/spring
   let cardPosition = spring(
@@ -26,11 +28,13 @@
     isDragging = true;
 
     // get the position of the mouse
-    const pos = getTouchingPos(e);
+    moveStartPos = getTouchingPos(e);
 
-    moveStartPos = {
-      x: pos.x - $cardPosition.x,
-      y: pos.y - $cardPosition.y,
+    // save current card position
+    cardSavedPos = {
+      x: $cardPosition.x,
+      y: $cardPosition.y,
+      rot: $cardPosition.rot,
     };
   };
 
@@ -38,10 +42,24 @@
     if (!isDragging) return;
 
     const pos = getTouchingPos(e);
+
+    // deadzone
+    let moveModifier = 1;
+    let angle = 0;
+
+    if (
+      Math.abs(pos.x - moveStartPos.x) < deadZoneRange &&
+      Math.abs(pos.y - moveStartPos.y) < deadZoneRange
+    ) {
+      moveModifier = 0.3;
+      angle = cardSavedPos.rot;
+    }
+
     // move the card
-    const deltaX = pos.x - moveStartPos.x;
-    const deltaY = pos.y - moveStartPos.y;
-    moveCard(deltaX, deltaY);
+    const deltaX = (pos.x - moveStartPos.x) * moveModifier + cardSavedPos.x;
+    const deltaY = (pos.y - moveStartPos.y) * moveModifier + cardSavedPos.y;
+
+    moveCard(deltaX, deltaY, angle);
   };
 
   const moveCard = (x, y, rot = 0, speed = 0) => {
@@ -79,7 +97,7 @@
   class="card"
   on:mousedown={handleCardTouch}
   on:touchstart={handleCardTouch}
-  style:--bgColor={`hsl(${$cardPosition.x / 10 + cardData.id * 5}, 50%, 50%)`}
+  style:--bgColor={`hsl(${$cardPosition.x / 10 + cardData.id * 10}, 50%, 50%)`}
   style:--posX={`${$cardPosition.x}px`}
   style:--posY={`${$cardPosition.y}px`}
   style:--rot={`${$cardPosition.rot}deg`}
