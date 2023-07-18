@@ -8,6 +8,8 @@
   let isDragging = false;
   let moveStartPos = { x: 0, y: 0 };
 
+  let tiltAngle = 40;
+
   // https://svelte.dev/tutorial/spring
   let cardPosition = spring(
     { x: 0, y: 0, rot: 90 },
@@ -46,15 +48,16 @@
     cardPosition.set({ x, y, rot }, { soft: speed });
   };
 
-  const cardBackToDeck = () => {
-    let angle = 0.4;
-    const rot = ((((cardData.id-1) / (totalCardCount-1) - 0.5)*2)*angle) || 0; // -1 to 1
+  const cardBackToDeck = (speed = 3) => {
+    const angle = (tiltAngle * Math.PI) / 180;
+    const ratio = (cardData.id - 1) / (totalCardCount - 1); // 0 to 1
+    const movedRatio = (ratio - 0.5) * 2; // -1 to 1
+    const finalAngle = movedRatio * angle || 0;
     moveCard(
-      Math.sin(rot) * 300,
-      Math.cos(rot) * 300 * -1,
-      (rot) * 90,
-      // 0,
-      3
+      Math.sin(finalAngle) * 300,
+      Math.cos(finalAngle) * 300 * -1,
+      finalAngle * 90,
+      speed
     );
   };
 
@@ -65,7 +68,10 @@
     cardData.id = cardData.id;
   };
 
-  $: cardBackToDeck(cardData.id);
+  $: {
+    cardBackToDeck();
+    cardData.id;
+  }
 </script>
 
 <div

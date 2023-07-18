@@ -21,6 +21,12 @@
   ];
 </script>
 
+<div class="card-wrapper">
+  {#each cardsData as cardData (cardData.id)}
+    <Card {cardData} totalCardCount={cardsData.length} />
+  {/each}
+</div>
+
 <button
   on:click={() =>
     (cardsData = [
@@ -28,16 +34,3 @@
       { id: cardsData.length + 1, title: `Card ${cardsData.length + 1}` },
     ])}>Add Card</button
 >
-
-
-<div class="wrapper">
-  {#each cardsData as cardData (cardData.id)}
-    <Card {cardData} totalCardCount={cardsData.length}  />
-  {/each}
-</div>
-
-<style>
-  .wrapper {
-    display: flex;
-  }
-</style>
