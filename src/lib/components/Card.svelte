@@ -9,7 +9,7 @@
   let cardSavedPos = { x: 0, y: 0 };
   let moveStartPos = { x: 0, y: 0 };
 
-  const tiltAngle = 40;
+  const maxTiltAngle = 40;
   const deadZoneRange = 150;
 
   // https://svelte.dev/tutorial/spring
@@ -66,8 +66,16 @@
     cardPosition.set({ x, y, rot }, { soft: speed });
   };
 
+  const tiltAngleDyn = () => {
+    // more than 7 returns max tilt angle
+    if (totalCardCount > 7) return maxTiltAngle;
+
+    // based on card count, tilt angle should be less
+    return (totalCardCount - 1) * 5;
+  }
+
   const cardBackToDeck = (speed = 3) => {
-    const angle = (tiltAngle * Math.PI) / 180;
+    const angle = (tiltAngleDyn() * Math.PI) / 180;
     const ratio = (cardData.id - 1) / (totalCardCount - 1); // 0 to 1
     const movedRatio = (ratio - 0.5) * 2; // -1 to 1
     const finalAngle = movedRatio * angle || 0;
