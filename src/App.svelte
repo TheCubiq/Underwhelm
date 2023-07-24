@@ -1,24 +1,8 @@
 <script>
-  import Card from "./lib/components/Card.svelte";
-
-  let cardsData = [
-    {
-      id: 1,
-      title: "Card 1",
-    },
-    // {
-    //   id: 2,
-    //   title: "Card 2",
-    // },
-    // {
-    //   id: 3,
-    //   title: "Card 3",
-    // },
-    // {
-    //   id: 4,
-    //   title: "Card 4",
-    // },
-  ];
+  import Card from "$lib/components/Card.svelte";
+  import CardControls from "$lib/components/CardControls.svelte";
+  
+  import { cards } from "./stores";
 </script>
 
 <div class="card-wrapper">
@@ -26,11 +10,17 @@
     <Card {cardData} totalCardCount={cardsData.length} />
   {/each}
 </div>
+<CardControls />
 
-<button
-  on:click={() =>
-    (cardsData = [
-      ...cardsData,
-      { id: cardsData.length + 1, title: `Card ${cardsData.length + 1}` },
-    ])}>Add Card</button
->
+<style>
+  .card-wrapper {
+    /* position: relative; */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+</style>
+
+
