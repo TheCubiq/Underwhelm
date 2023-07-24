@@ -5,9 +5,11 @@
   import { cards } from "./stores";
 </script>
 
+
+
 <div class="card-wrapper">
-  {#each cardsData as cardData (cardData.id)}
-    <Card {cardData} totalCardCount={cardsData.length} />
+  {#each $cards as cardData, i (cardData.id)}
+    <Card {cardData} idx={i} totalCardCount={$cards.length} />
   {/each}
 </div>
 <CardControls />
